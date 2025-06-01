@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ambigram"
+dynamic = ["version"]
+
+authors = [
+  { name="sivefunc", email="sivefunc@tuta.io" },
+]
+
+description = "Ambigram"
+# readme = {file = 'README.md', content-type='text/markdown', charset="UTF-8", variant="GFM"}
+requires-python = ">=3.11"
+
+license = { file = "LICENSE" }
+#classifiers = [
+#    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+#    "Programming Language :: Python",
+#    "Programming Language :: Python :: 3",
+#]
+
+dependencies = [
+    "cadquery"
+]
+
+keywords = ['linux', 'python3']
+
+[tool.setuptools.dynamic]
+version = {attr = "_version.__version__"}
+
+[project.urls]
+Homepage = "https://github.com/Sivefunc/"
+
+[project.scripts]
+Ambigram = "ambigram:main"
