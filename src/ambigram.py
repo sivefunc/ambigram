@@ -8,15 +8,23 @@ class Ambigram(object):
     assembly = None
     merged_string = None
 
-    def __init__(self, first_text: str, second_text: str):
+    def __init__(self,
+                 first_text: str,
+                 second_text: str,
+                 font_path: str = None,
+                 ):
+
+        self.first_text = first_text
+        self.second_text = second_text
+        self.font_path = font_path
+
         self.assembly = cq.Assembly()
-        self.merged_string = merge_strings(first_text, second_text)
+        self.merged_string = merge_strings(self.first_text, self.second_text)
 
         location = (0, 0, 0)
         for (short_char, *long_chars) in self.merged_string:
             bb_int = None
             for long_char in long_chars:
-                print(short_char, long_char)
                 x, y, z = location
 
                 xline = cq.Workplane("XZ").text(
@@ -25,7 +33,7 @@ class Ambigram(object):
                     1,
                     halign="left",
                     valign="bottom",
-                    fontPath="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf"
+                    fontPath=self.font_path
                 )
 
                 yline = cq.Workplane("XZ").text(
@@ -34,7 +42,7 @@ class Ambigram(object):
                     1,
                     halign="left",
                     valign="bottom",
-                    fontPath="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf"
+                    fontPath=self.font_path,
                 ).rotate([0,0,0],[0,0,1], -90)
 
                 bbx = xline.val().BoundingBox()
@@ -57,7 +65,11 @@ class Ambigram(object):
             location = x + bb_int.xlen, y, z
 
 def main():
-    ambigram = Ambigram("HOLIWIS", "CAMIONX")
+    ambigram = Ambigram(
+        "HOLIWIS",
+        "CAMIONX",
+        font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf"
+    )
     show(ambigram.assembly)
 
 if __name__ == "__main__":
