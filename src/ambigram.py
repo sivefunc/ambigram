@@ -14,54 +14,50 @@ class Ambigram(object):
 
         location = (0, 0, 0)
         for (short_char, *long_chars) in self.merged_string:
-            bbox = None
+            bb_int = None
             for long_char in long_chars:
+                print(short_char, long_char)
                 x, y, z = location
 
-                letter_in_xline = cq.Workplane("XZ").text(
+                xline = cq.Workplane("XZ").text(
                     short_char,
                     1,
-                    2,
+                    1,
                     halign="left",
                     valign="bottom",
                     fontPath="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf"
                 )
 
-                letter_in_yline = cq.Workplane("XZ").text(
+                yline = cq.Workplane("XZ").text(
                     long_char,
                     1,
-                    2,
+                    1,
                     halign="left",
                     valign="bottom",
                     fontPath="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf"
+                ).rotate([0,0,0],[0,0,1], -90)
 
-                ).rotate([0, 0, 0], [0, 0, 1], -90)
+                bbx = xline.val().BoundingBox()
+                bby = yline.val().BoundingBox()
+                
+                # Text() objects are away from origin (0, 0, 0) so we have to
+                # do this weird trick of reversing their displacement.
+                # translate(0,0,0) won't work (amazing I know)
+                xline = xline.translate([-bbx.xmin,-bbx.ymin,-bbx.zmin])
+                yline = yline.translate([-bby.xmin,-bby.ymin,-bby.zmin])
 
-                bbox_xline = letter_in_xline.val().BoundingBox()
-                bbox_yline = letter_in_yline.val().BoundingBox()
+                intersection = xline.intersect(yline)
+                bb_int = intersection.val().BoundingBox()
 
-                letter_in_xline = letter_in_xline.translate([
-                    x - bbox_xline.xmin,
-                    y - bbox_xline.ymin,
-                    z - bbox_xline.zmin,
-                ])
-
-                letter_in_yline = letter_in_yline.translate([
-                    x - bbox_yline.xmin,
-                    y - bbox_yline.ymin,
-                    z - bbox_yline.zmin,
-                ])
-
-                intersection = letter_in_xline.intersect(letter_in_yline)
+                location = x, y - bb_int.ylen, z
+                intersection = intersection.translate(location)
                 self.assembly.add(intersection)
 
-                bbox = intersection.val().BoundingBox()
-                location = x, y - bbox.ylen, z
             x, y, z = location
-            location = x + bbox.xlen, y, z
+            location = x + bb_int.xlen, y, z
 
 def main():
-    ambigram = Ambigram("RECURSIVE", "FUNCTION")
+    ambigram = Ambigram("HOLIWIS", "CAMIONX")
     show(ambigram.assembly)
 
 if __name__ == "__main__":
