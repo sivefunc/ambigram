@@ -4,8 +4,8 @@ def merge_strings(
     ) -> list[list[str]]:
     """ Place longest string chars behind the shortest string
 
-    Two unsorted strings gets sorted and the longest gets merged into
-    the shortest one by placing their chars behind in a 
+    Two unsorted strings gets sorted (by length) and the longest gets
+    merged into the shortest one by placing their chars behind in a
     secuential and equally distributed way.
 
     Think of it like adding blocks to each column until all columns
@@ -85,7 +85,7 @@ def merge_strings(
          ['G', 'Y', 'Z']]
     """
     merged_strings = []
-    shortest, longest = sorted([string1, string2])
+    shortest, longest = sorted([string1, string2], key=lambda x: len(x))
     shortest_len, longest_len = len(shortest), len(longest)
 
     column_height = longest_len // shortest_len
