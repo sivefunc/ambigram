@@ -88,7 +88,7 @@ class Ambigram(object):
         self.second_text = second_text
         self.font_path = font_path
 
-        self.assembly = cq.Assembly()
+        self.assembly = cq.Assembly(loc=cq.Location(0,0,0))
         self.merged_string = merge_strings(self.first_text, self.second_text)
 
         location = (0, 0, 0)
@@ -117,7 +117,7 @@ class Ambigram(object):
                     halign="left",
                     valign="bottom",
                     fontPath=self.font_path,
-                ).rotate([0,0,0],[0,0,1], -90)
+                ).rotate([0,0,0],[0,0,1], 90)
 
                 # All Intersections are done at [0, 0, 0] then are translated
                 # to their corresponding position, forming a diagonal.
@@ -142,8 +142,8 @@ class Ambigram(object):
 
                 bb_int = intersection.val().BoundingBox()
 
-                location = x, y - bb_int.ylen, z
                 intersection = intersection.translate(location)
+                location = x, y + bb_int.ylen, z
 
                 self.assembly = self.assembly.add(intersection)
 
@@ -152,8 +152,8 @@ class Ambigram(object):
 
 def main():
     ambigram = Ambigram(
-        "AVERYLONGWORD",
-        "SHORT",
+        "HELLO",
+        "WORLD",
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf"
     )
     show(ambigram.assembly)
