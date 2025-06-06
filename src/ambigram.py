@@ -32,6 +32,7 @@ class Ambigram(object):
     def __init__(self,
                  first_text: str,
                  second_text: str,
+                 font_size: int = 16,
                  font_path: str = None,
                  ):
         """Creates the 3D Ambigram in a Cadquery Assembly Object
@@ -88,6 +89,7 @@ class Ambigram(object):
 
         self.first_text = first_text
         self.second_text = second_text
+        self.font_size = font_size
         self.font_path = font_path
 
         self.assembly = cq.Assembly(loc=cq.Location(0,0,0))
@@ -104,8 +106,8 @@ class Ambigram(object):
                 # Letter that will be visible in the Positive X Line
                 xline = cq.Workplane("XZ").text(
                     txt=short_char,
-                    fontsize=1,
-                    distance=1,
+                    fontsize=self.font_size,
+                    distance=self.font_size,
                     halign="left",
                     valign="bottom",
                     fontPath=self.font_path
@@ -114,8 +116,8 @@ class Ambigram(object):
                 # Letter that will be visible in the Negative Y Line
                 yline = cq.Workplane("XZ").text(
                     txt=long_char,
-                    fontsize=1,
-                    distance=1,
+                    fontsize=self.font_size,
+                    distance=self.font_size,
                     halign="left",
                     valign="bottom",
                     fontPath=self.font_path,
@@ -159,7 +161,7 @@ class Ambigram(object):
             self.max_column = list(map(max, zip(self.max_column,
                                                 current_column)))
 
-    def add_base(self, height=0.1):
+    def add_base(self, height: int):
         bb = self.assembly.toCompound().BoundingBox()
         self.base = (cq.Workplane("XY").polyline([
             [bb.xmin + self.max_column[0], bb.ymin],
@@ -184,7 +186,7 @@ def main():
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf"
     )
 
-    show(ambigram.add_base().assembly)
+    show(ambigram.add_base(height=ambigram.font_size / 10).assembly)
 
 if __name__ == "__main__":
     main()
