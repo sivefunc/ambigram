@@ -33,6 +33,7 @@ class Ambigram(object):
                  first_text: str,
                  second_text: str,
                  font_size: int = 16,
+                 letter_spacing: int = None,
                  font_path: str = None,
                  ):
         """Creates the 3D Ambigram in a Cadquery Assembly Object
@@ -92,6 +93,10 @@ class Ambigram(object):
         self.font_size = font_size
         self.font_path = font_path
 
+        self.letter_spacing = letter_spacing
+        if letter_spacing is None:
+            self.letter_spacing = self.font_size / 16
+
         self.assembly = cq.Assembly(loc=cq.Location(0,0,0))
         self.merged_string = merge_strings(self.first_text, self.second_text)
 
@@ -147,16 +152,16 @@ class Ambigram(object):
                 bb_int = intersection.val().BoundingBox()
 
                 intersection = intersection.translate(location)
-                location = x, y + bb_int.ylen, z
+                location = x, y + bb_int.ylen + self.letter_spacing, z
 
                 self.assembly = self.assembly.add(intersection)
 
                 current_column[0] = max(current_column[0], bb_int.xlen)
-                current_column[1] += bb_int.ylen
+                current_column[1] += bb_int.ylen + self.letter_spacing
                 current_column[2] = max(current_column[2], bb_int.zlen)
 
             x, y, z = location
-            location = x + bb_int.xlen, y, z
+            location = x + bb_int.xlen + self.letter_spacing, y, z
 
             self.max_column = list(map(max, zip(self.max_column,
                                                 current_column)))
@@ -181,8 +186,8 @@ class Ambigram(object):
 
 def main():
     ambigram = Ambigram(
-        "HELLO",
-        "WORLD",
+        "AAAAA",
+        "AAAAA",
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf"
     )
 
