@@ -26,6 +26,8 @@ class Ambigram(object):
 
     assembly = None
     merged_string = None
+    base = None
+    max_column = [0, 0, 0]
     
     def __init__(self,
                  first_text: str,
@@ -94,7 +96,7 @@ class Ambigram(object):
         location = (0, 0, 0)
         for (short_char, *long_chars) in self.merged_string:
             bb_int = None
-
+            current_column = [0, 0, 0] 
             # Intersect each pair of letters
             for long_char in long_chars:
                 x, y, z = location
@@ -147,8 +149,33 @@ class Ambigram(object):
 
                 self.assembly = self.assembly.add(intersection)
 
+                current_column[0] = max(current_column[0], bb_int.xlen)
+                current_column[1] += bb_int.ylen
+                current_column[2] = max(current_column[2], bb_int.zlen)
+
             x, y, z = location
             location = x + bb_int.xlen, y, z
+
+            self.max_column = list(map(max, zip(self.max_column,
+                                                current_column)))
+
+    def add_base(self, height=0.1):
+        bb = self.assembly.toCompound().BoundingBox()
+        self.base = (cq.Workplane("XY").polyline([
+            [bb.xmin + self.max_column[0], bb.ymin],
+            [bb.xmin, bb.ymin],
+            [bb.xmin, bb.ymin + self.max_column[1]],
+
+            [bb.xmax - self.max_column[0], bb.ymax],
+            [bb.xmax, bb.ymax],
+            [bb.xmax, bb.ymax - self.max_column[1]]
+            ])
+            .close()
+            .extrude(height)
+            .translate([bb.xmin, bb.ymin, bb.zmin - height])
+        )
+        self.assembly = self.assembly.add(self.base)
+        return self
 
 def main():
     ambigram = Ambigram(
@@ -156,7 +183,8 @@ def main():
         "WORLD",
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf"
     )
-    show(ambigram.assembly)
+
+    show(ambigram.add_base().assembly)
 
 if __name__ == "__main__":
     main()
