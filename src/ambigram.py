@@ -27,6 +27,7 @@ class Ambigram(object):
     assembly = None
     merged_string = None
     base = None
+
     max_column = [0, 0, 0]
     
     def __init__(self,
@@ -97,7 +98,7 @@ class Ambigram(object):
         if letter_spacing is None:
             self.letter_spacing = self.font_size / 16
 
-        self.assembly = cq.Assembly(loc=cq.Location(0,0,0))
+        self.assembly = cq.Assembly(loc=cq.Location(0,0,0), name="root")
         self.merged_string = merge_strings(self.first_text, self.second_text)
 
         location = (0, 0, 0)
@@ -181,17 +182,85 @@ class Ambigram(object):
             .extrude(height)
             .translate([bb.xmin, bb.ymin, bb.zmin - height])
         )
-        self.assembly = self.assembly.add(self.base)
+        self.assembly = self.assembly.add(self.base, name="base")
+        return self
+
+
+    def add_letter_support(self,
+                           letter_id: str,
+                           cylinder_height: int = None,
+                           cylinder_radius: int = None,
+                           square_height: int = None):
+
+        letter = self.assembly.objects[letter_id].toCompound().BoundingBox()
+        cylinder_support = (
+            cq.Workplane("XY")
+            .cylinder(cylinder_height, cylinder_radius, centered=[
+                True, True, False
+            ])
+            .translate([
+                letter.center.x,
+                letter.center.y,
+                letter.zmin - cylinder_height - (
+                    0 if square_height is None else square_height 
+                )
+            ])
+            if None not in [cylinder_radius, cylinder_height] else None
+        )
+
+        rectangle_support = (
+            cq.Workplane("XY")
+            .box(letter.xlen, letter.ylen, square_height, centered=False)
+            .translate([
+                letter.xmin,
+                letter.ymin,
+                letter.zmin - square_height
+            ])
+            if square_height is not None else None
+        )
+
+        if None not in [cylinder_support, rectangle_support]:
+            support_base = rectangle_support.union(cylinder_support)
+
+        elif cylinder_support is not None:
+            support_base = cylinder_support
+
+        else:
+            support_base = rectangle_support
+
+        self.assembly = self.assembly.add(support_base)
+        return self
+    
+    def add_letter_support_to_all(self,
+                                  cylinder_height: int = None,
+                                  cylinder_radius: int = None,
+                                  square_height: int = None
+                                  ):
+        for letter_id in list(self.assembly.objects.keys()):
+            if letter_id in ['root', 'base', 'blank_space']:
+                continue
+
+            self.add_letter_support(letter_id,
+                                    cylinder_height,
+                                    cylinder_radius,
+                                    square_height)
         return self
 
 def main():
     ambigram = Ambigram(
-        "AAAAA",
-        "AAAAA",
-        font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf"
+        "RIMA",
+        "DISONANTE",
+        font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf",
+    )
+    
+    ambigram = ambigram.add_letter_support_to_all(
+        cylinder_height=ambigram.font_size / 4,
+        cylinder_radius=ambigram.font_size / 4,
+        square_height=ambigram.font_size / 16,
     )
 
-    show(ambigram.add_base(height=ambigram.font_size / 10).assembly)
+    ambigram = ambigram.add_base(height=ambigram.font_size / 10).assembly
 
+    show(ambigram)
 if __name__ == "__main__":
     main()
