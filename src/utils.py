@@ -87,7 +87,11 @@ def merge_strings(
          ['G', 'Y', 'Z']]
     """
     merged_strings = []
-    shortest, longest = sorted([string1, string2], key=lambda x: len(x))
+    shortest, longest = sorted(
+        [string1, string2],
+        key=lambda x: len(x) - (x.count(delimiter) if ignore_delimiter else 0)
+    )
+
     shortest_len, longest_len = len(shortest), len(longest)
 
     if ignore_delimiter:
@@ -120,8 +124,20 @@ def merge_strings(
         # Add merged string to result
         merged_strings.append(column)
 
-    for idx, column in enumerate(merged_strings[:-1]):
-        while len(column) > 1 and column[-1] == delimiter:
+    idx = 0
+    while idx < len(merged_strings) - 1:
+        column = merged_strings[idx]
+        while (len(column) > 1 
+               and column[-1] == delimiter 
+               and column[0] != delimiter):
             merged_strings[idx+1].insert(1, column.pop())
 
+        if len(column) == 1 and column[0] != delimiter:
+            merged_strings[idx].insert(1, merged_strings[idx-1].pop())
+            idx = 0
+
+        else:
+            idx += 1
+
+    pprint.pprint(merged_strings)
     return merged_strings
