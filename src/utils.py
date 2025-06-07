@@ -124,8 +124,6 @@ def merge_strings(
         # Add merged string to result
         merged_strings.append(column)
 
-    import pprint
-    pprint.pprint(merged_strings)
     idx = 0
     while idx < len(merged_strings) - 1:
         column = merged_strings[idx]
@@ -138,5 +136,4 @@ def merge_strings(
         else:
             idx += 1
 
-    pprint.pprint(merged_strings)
     return merged_strings
