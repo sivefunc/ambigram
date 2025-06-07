@@ -113,26 +113,25 @@ class Ambigram(object):
             current_column = [0, 0, 0] 
 
             # Intersect each pair of letters
-            if short_char != " " or (long_chars and long_chars[-1] != " "):
-                for long_char in long_chars:
-                    x, y, z = location
+            for long_char in long_chars:
+                x, y, z = location
 
-                    if long_char == " ":
-                        bb_int = bb_whitespace
+                if long_char == " ":
+                    bb_int = bb_whitespace
 
-                    else:
-                        intersection = self.intersect_letters(short_char,
-                                                              long_char)
-                        bb_int = intersection.val().BoundingBox()
-                        intersection = intersection.translate(location)
+                else:
+                    intersection = self.intersect_letters(short_char,
+                                                          long_char)
+                    bb_int = intersection.val().BoundingBox()
+                    intersection = intersection.translate(location)
 
-                    location = x, y + bb_int.ylen + self.letter_spacing, z
+                location = x, y + bb_int.ylen + self.letter_spacing, z
 
-                    self.assembly = self.assembly.add(intersection)
+                self.assembly = self.assembly.add(intersection)
 
-                    current_column[0] = max(current_column[0], bb_int.xlen)
-                    current_column[1] += bb_int.ylen + self.letter_spacing
-                    current_column[2] = max(current_column[2], bb_int.zlen)
+                current_column[0] = max(current_column[0], bb_int.xlen)
+                current_column[1] += bb_int.ylen + self.letter_spacing
+                current_column[2] = max(current_column[2], bb_int.zlen)
 
             if short_char == " ":
                 bb_int = bb_whitespace
@@ -269,14 +268,13 @@ class Ambigram(object):
         return self
 
 def main():
-    #"AAAAAAAA"
-    #"F F F",
-    #"FFFF FFF FFFFF FFF",
-    #"AA AAAAAA AAA",
-
     ambigram = Ambigram(
-        "F  FFFF",
-        "AAAA",
+        #"AAAAAAAA",
+        #"F F F",
+        #"FFFF FFF FFFFF FFF",
+        #"AA AAAAAA AAA",
+        "F F F F F F F",
+        "AAA",
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf",
     )
     

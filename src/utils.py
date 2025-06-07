@@ -124,19 +124,19 @@ def merge_strings(
         # Add merged string to result
         merged_strings.append(column)
 
+    import pprint
+    pprint.pprint(merged_strings)
     idx = 0
     while idx < len(merged_strings) - 1:
         column = merged_strings[idx]
-        while (len(column) > 1 
-               and column[-1] == delimiter 
-               and column[0] != delimiter):
-            merged_strings[idx+1].insert(1, column.pop())
-
-        if len(column) == 1 and column[0] != delimiter:
+        if (column[0] != delimiter 
+            and column[1:] 
+            and not any(letter != delimiter for letter in column[1:])):
             merged_strings[idx].insert(1, merged_strings[idx-1].pop())
             idx = 0
 
         else:
             idx += 1
 
+    pprint.pprint(merged_strings)
     return merged_strings
