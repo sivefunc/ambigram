@@ -139,12 +139,13 @@ class Ambigram(object):
                 current_column[1] += bb_int.ylen + self.letter_spacing
                 current_column[2] = max(current_column[2], bb_int.zlen)
 
+            if short_char == " " and not long_chars:
+                bb_int = bb_whitespace
+
             x, y, z = location
             location = (
-                x + bb_int.xlen + self.letter_spacing
-                    + (bb_int.xlen if short_char == " " else 0),
-                y + (bb_int.ylen + self.letter_spacing
-                     if short_char == " " and not long_chars else 0),
+                x + bb_int.xlen + self.letter_spacing,
+                y,
                 z)
 
             self.max_column = list(map(max, zip(self.max_column,
@@ -275,7 +276,7 @@ class Ambigram(object):
 def main():
     ambigram = Ambigram(
         "AAAAAAAA",
-        "FFF",
+        "F F F",
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf",
     )
     

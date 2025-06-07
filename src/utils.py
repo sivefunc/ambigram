@@ -120,8 +120,6 @@ def merge_strings(
         # Add merged string to result
         merged_strings.append(column)
 
-    import pprint
-    pprint.pprint(merged_strings)
     for idx, column in enumerate(merged_strings[:-1]):
         while len(column) > 1 and column[-1] == delimiter:
             merged_strings[idx+1].insert(1, column.pop())
