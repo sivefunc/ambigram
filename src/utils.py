@@ -97,7 +97,8 @@ def merge_strings(
     current_longest = 0
 
     # Start Distributing Equally
-    for idx, short_char in enumerate(shortest):
+    column_extra_added = 0
+    for short_char in shortest:
         
         # The first character is always the one from the shortest string
         column = [short_char]
@@ -111,13 +112,16 @@ def merge_strings(
             current_longest += column_height
 
             # First columns add one more row
-            if idx < longest_len % shortest_len:
+            if column_extra_added < longest_len % shortest_len:
                 column.append(longest[current_longest])
                 current_longest += 1
+                column_extra_added += 1
 
         # Add merged string to result
         merged_strings.append(column)
 
+    import pprint
+    pprint.pprint(merged_strings)
     for idx, column in enumerate(merged_strings[:-1]):
         while len(column) > 1 and column[-1] == delimiter:
             merged_strings[idx+1].insert(1, column.pop())
