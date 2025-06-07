@@ -16,11 +16,13 @@ def merge_strings(
 
     Parameters
     ----------
-    first_text : str
+    string1 : str
                  Non-empty unsorted string.
 
-    second_text : str
+    string2 : str
                   Non-empty unsorted string.
+
+
 
     Returns
     -------
