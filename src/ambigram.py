@@ -99,7 +99,20 @@ class Ambigram(object):
             self.letter_spacing = self.font_size / 16
 
         self.assembly = cq.Assembly(loc=cq.Location(0,0,0), name="root")
-        self.merged_string = merge_strings(self.first_text, self.second_text)
+        self.merged_string = merge_strings(self.first_text,
+                                           self.second_text,
+                                           ignore_delimiter=True,
+                                           delimiter=" ")
+
+        if (' ' in first_text or ' ' in second_text):
+            bb_whitespace = cq.Workplane("XZ").text(
+                txt='A',
+                fontsize=self.font_size,
+                distance=self.font_size,
+                halign="left",
+                valign="bottom",
+                fontPath=self.font_path
+            ).val().BoundingBox()
 
         location = (0, 0, 0)
         for (short_char, *long_chars) in self.merged_string:
@@ -109,50 +122,15 @@ class Ambigram(object):
             for long_char in long_chars:
                 x, y, z = location
 
-                # Letter that will be visible in the Positive X Line
-                xline = cq.Workplane("XZ").text(
-                    txt=short_char,
-                    fontsize=self.font_size,
-                    distance=self.font_size,
-                    halign="left",
-                    valign="bottom",
-                    fontPath=self.font_path
-                )
+                if long_char == " ":
+                    bb_int = bb_whitespace
 
-                # Letter that will be visible in the Negative Y Line
-                yline = cq.Workplane("XZ").text(
-                    txt=long_char,
-                    fontsize=self.font_size,
-                    distance=self.font_size,
-                    halign="left",
-                    valign="bottom",
-                    fontPath=self.font_path,
-                ).rotate([0,0,0],[0,0,1], 90)
+                else:
+                    intersection = self.intersect_letters(short_char,
+                                                          long_char)
+                    bb_int = intersection.val().BoundingBox()
+                    intersection = intersection.translate(location)
 
-                # All Intersections are done at [0, 0, 0] then are translated
-                # to their corresponding position, forming a diagonal.
-                # y(+)
-                # |
-                # |
-                # |
-                # |_______ x(+)
-                # 0
-
-                # Bounding Box
-                bbx = xline.val().BoundingBox()
-                bby = yline.val().BoundingBox()
-
-                # Text() objects are away from origin (0, 0, 0) so we have to
-                # do this weird trick of reversing their displacement.
-                # translate(0,0,0) won't work (amazing I know)
-                xline = xline.translate([-bbx.xmin,-bbx.ymin,-bbx.zmin])
-                yline = yline.translate([-bby.xmin,-bby.ymin,-bby.zmin])
-                
-                intersection = xline.intersect(yline)
-
-                bb_int = intersection.val().BoundingBox()
-
-                intersection = intersection.translate(location)
                 location = x, y + bb_int.ylen + self.letter_spacing, z
 
                 self.assembly = self.assembly.add(intersection)
@@ -162,10 +140,58 @@ class Ambigram(object):
                 current_column[2] = max(current_column[2], bb_int.zlen)
 
             x, y, z = location
-            location = x + bb_int.xlen + self.letter_spacing, y, z
+            location = (
+                x + bb_int.xlen + self.letter_spacing
+                    + (bb_int.xlen if short_char == " " else 0),
+                y + (bb_int.ylen + self.letter_spacing
+                     if short_char == " " and not long_chars else 0),
+                z)
 
             self.max_column = list(map(max, zip(self.max_column,
                                                 current_column)))
+
+    def intersect_letters(self, short_char, long_char):
+        # Letter that will be visible in the Positive X Line
+        xline = cq.Workplane("XZ").text(
+            txt=short_char,
+            fontsize=self.font_size,
+            distance=self.font_size,
+            halign="left",
+            valign="bottom",
+            fontPath=self.font_path
+        )
+
+        # Letter that will be visible in the Negative Y Line
+        yline = cq.Workplane("XZ").text(
+            txt=long_char,
+            fontsize=self.font_size,
+            distance=self.font_size,
+            halign="left",
+            valign="bottom",
+            fontPath=self.font_path,
+        ).rotate([0,0,0],[0,0,1], 90)
+
+        # All Intersections are done at [0, 0, 0] then are translated
+        # to their corresponding position, forming a diagonal.
+        # y(+)
+        # |
+        # |
+        # |
+        # |_______ x(+)
+        # 0
+
+        # Bounding Box
+        bbx = xline.val().BoundingBox()
+        bby = yline.val().BoundingBox()
+
+        # Text() objects are away from origin (0, 0, 0) so we have to
+        # do this weird trick of reversing their displacement.
+        # translate(0,0,0) won't work (amazing I know)
+        xline = xline.translate([-bbx.xmin,-bbx.ymin,-bbx.zmin])
+        yline = yline.translate([-bby.xmin,-bby.ymin,-bby.zmin])
+        
+        intersection = xline.intersect(yline)
+        return intersection
 
     def add_base(self, height: int):
         bb = self.assembly.toCompound().BoundingBox()
@@ -248,8 +274,8 @@ class Ambigram(object):
 
 def main():
     ambigram = Ambigram(
-        "RIMA",
-        "DISONANTE",
+        "AAAAAAAA",
+        "FFF",
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf",
     )
     

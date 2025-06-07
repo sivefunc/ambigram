@@ -1,6 +1,8 @@
 def merge_strings(
     string1: str,
     string2: str,
+    ignore_delimiter: bool = False,
+    delimiter: str = ' ',
     ) -> list[list[str]]:
     """ Place longest string chars behind the shortest string
 
@@ -88,6 +90,9 @@ def merge_strings(
     shortest, longest = sorted([string1, string2], key=lambda x: len(x))
     shortest_len, longest_len = len(shortest), len(longest)
 
+    if ignore_delimiter:
+        shortest_len -= shortest.count(delimiter)
+
     column_height = longest_len // shortest_len
     current_longest = 0
 
@@ -98,18 +103,23 @@ def merge_strings(
         column = [short_char]
 
         # Add column_height chars to column
-        for long_char in longest[current_longest:
-                                 current_longest + column_height]:
-            column.append(long_char)
+        if short_char != delimiter:
+            for long_char in longest[current_longest:
+                                     current_longest + column_height]:
+                column.append(long_char)
 
-        current_longest += column_height
+            current_longest += column_height
 
-        # First columns add one more row
-        if idx < longest_len % shortest_len:
-            column.append(longest[current_longest])
-            current_longest += 1
+            # First columns add one more row
+            if idx < longest_len % shortest_len:
+                column.append(longest[current_longest])
+                current_longest += 1
 
         # Add merged string to result
         merged_strings.append(column)
+
+    for idx, column in enumerate(merged_strings[:-1]):
+        while len(column) > 1 and column[-1] == delimiter:
+            merged_strings[idx+1].insert(1, column.pop())
 
     return merged_strings
