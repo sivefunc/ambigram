@@ -2,8 +2,8 @@ def merge_strings(
     string1: str,
     string2: str,
     ignore_delimiter: bool = False,
-    allow_delimiter_column: bool = False,
     delimiter: str = ' ',
+    allow_delimiter_column: bool = False,
     ) -> list[list[str]]:
     """ Place longest string chars behind the shortest string
 
@@ -17,12 +17,29 @@ def merge_strings(
     Parameters
     ----------
     string1 : str
-                 Non-empty unsorted string.
+              Non-empty unsorted string.
 
     string2 : str
-                  Non-empty unsorted string.
+              Non-empty unsorted string.
+    
+    ignore_delimiter : bool, default=True
+                       Determines whether or not to place the longest
+                       string characters into the delimiters of the
+                       shortest word.
 
+    delimiter : str, default=' '
+                The character that should be ignored and no characters
+                must be placed behind of it.
 
+    allow_delimiter_column : bool, default=False
+                             Determines whether or not a short character
+                             != delimiter could have a column of chars
+                             behind that are only equal to delimiter.
+
+                             If false then long chars of the columns that
+                             are before the shortest word will be 
+                             moving until the column has atleast one
+                             char != delimiter.
 
     Returns
     -------
@@ -127,7 +144,7 @@ def merge_strings(
         # Add merged string to result
         merged_strings.append(column)
 
-    if not allow_delimiter_column:
+    if ignore_delimiters and not allow_delimiter_column:
         idx = 0
         while idx < len(merged_strings) - 1:
             column = merged_strings[idx]
