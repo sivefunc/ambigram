@@ -2,6 +2,7 @@ def merge_strings(
     string1: str,
     string2: str,
     ignore_delimiter: bool = False,
+    allow_delimiter_column: bool = False,
     delimiter: str = ' ',
     ) -> list[list[str]]:
     """ Place longest string chars behind the shortest string
@@ -124,16 +125,17 @@ def merge_strings(
         # Add merged string to result
         merged_strings.append(column)
 
-    idx = 0
-    while idx < len(merged_strings) - 1:
-        column = merged_strings[idx]
-        if (column[0] != delimiter 
-            and column[1:] 
-            and not any(letter != delimiter for letter in column[1:])):
-            merged_strings[idx].insert(1, merged_strings[idx-1].pop())
-            idx = 0
+    if not allow_delimiter_column:
+        idx = 0
+        while idx < len(merged_strings) - 1:
+            column = merged_strings[idx]
+            if (column[0] != delimiter 
+                and column[1:] 
+                and not any(letter != delimiter for letter in column[1:])):
+                merged_strings[idx].insert(1, merged_strings[idx-1].pop())
+                idx = 0
 
-        else:
-            idx += 1
+            else:
+                idx += 1
 
     return merged_strings
