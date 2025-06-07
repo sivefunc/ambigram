@@ -16,76 +16,76 @@ def merge_strings(
 
     Parameters
     ----------
-        first_text : str
-                     Non-empty unsorted string.
+    first_text : str
+                 Non-empty unsorted string.
 
-        second_text : str
-                      Non-empty unsorted string.
+    second_text : str
+                  Non-empty unsorted string.
 
     Returns
     -------
-        values : list[list[str]]
-                 List of List[str] where each List[str] represents 
-                 the shortest letter (in position) and then
-                 the longest characters (in order)
+    values : list[list[str]]
+             List of List[str] where each List[str] represents 
+             the shortest letter (in position) and then
+             the longest characters (in order)
     Notes
     -----
-        Secuential direction is left to right.
+    Secuential direction is left to right.
 
-        Equal distribution is by placing Floor(Long / Short)
-        chars secuentially behind shortest string, in the first
-        Long % Short Columns take one more character. 
+    Equal distribution is by placing Floor(Long / Short)
+    chars secuentially behind shortest string, in the first
+    Long % Short Columns take one more character. 
 
-        Take for instance the following:
+    Take for instance the following:
 
-            String1 (Lenght 19): HIJKLMNOPQRSTUVWXYZ
-            String2 (Lenght 07): ABCDEFG
+        String1 (Lenght 19): HIJKLMNOPQRSTUVWXYZ
+        String2 (Lenght 07): ABCDEFG
 
-            Place Floor(19/7) = 2 chars per each letter in shortest string,
-            during the first (19 % 7) = 5 rows take one more character.
+        Place Floor(19/7) = 2 chars per each letter in shortest string,
+        during the first (19 % 7) = 5 rows take one more character.
 
-            HKNQT
-            ILORUWY
-            JMPSVXZ
-            ABCDEFG
+        HKNQT
+        ILORUWY
+        JMPSVXZ
+        ABCDEFG
 
-        Why it Works?
-            Long / Short is a rational number that indicates
-            splitting the longest word into Short Sections.
+    Why it Works?
+        Long / Short is a rational number that indicates
+        splitting the longest word into Short Sections.
 
-            We take Floor(Long/Short) because there are no
-            rational characters, we need integers to be exact.
+        We take Floor(Long/Short) because there are no
+        rational characters, we need integers to be exact.
 
-            Obviously a remainder now exist (Long % Short) <= Short
-            so these characters must be placed in the first 
-            (Long % Short) columns.
+        Obviously a remainder now exist (Long % Short) <= Short
+        so these characters must be placed in the first 
+        (Long % Short) columns.
 
-            Floor(Long / Short) * Short + (Long % Short) = Long
+        Floor(Long / Short) * Short + (Long % Short) = Long
 
     Examples
     --------
-        Shortest is "Function" and Longest is "Recursive"
-        >>> merge_strings("function", "recursive")
-        ... # doctest: +NORMALIZE_WHITESPACE
-        [['f', 'r', 'e'],
-         ['u', 'c'],
-         ['n', 'u'],
-         ['c', 'r'],
-         ['t', 's'],
-         ['i', 'i'],
-         ['o', 'v'],
-         ['n', 'e']]
-        
-        Shortest is "ABCDEFG" and Longest is "HIJKLMNOPQRSTUVWXYZ"
-        >>> merge_strings("ABCDEFG", "HIJKLMNOPQRSTUVWXYZ")
-        ... # doctest: +NORMALIZE_WHITESPACE
-        [['A', 'H', 'I', 'J'],
-         ['B', 'K', 'L', 'M'],
-         ['C', 'N', 'O', 'P'],
-         ['D', 'Q', 'R', 'S'],
-         ['E', 'T', 'U', 'V'],
-         ['F', 'W', 'X'],
-         ['G', 'Y', 'Z']]
+    Shortest is "Function" and Longest is "Recursive"
+    >>> merge_strings("function", "recursive")
+    ... # doctest: +NORMALIZE_WHITESPACE
+    [['f', 'r', 'e'],
+     ['u', 'c'],
+     ['n', 'u'],
+     ['c', 'r'],
+     ['t', 's'],
+     ['i', 'i'],
+     ['o', 'v'],
+     ['n', 'e']]
+    
+    Shortest is "ABCDEFG" and Longest is "HIJKLMNOPQRSTUVWXYZ"
+    >>> merge_strings("ABCDEFG", "HIJKLMNOPQRSTUVWXYZ")
+    ... # doctest: +NORMALIZE_WHITESPACE
+    [['A', 'H', 'I', 'J'],
+     ['B', 'K', 'L', 'M'],
+     ['C', 'N', 'O', 'P'],
+     ['D', 'Q', 'R', 'S'],
+     ['E', 'T', 'U', 'V'],
+     ['F', 'W', 'X'],
+     ['G', 'Y', 'Z']]
     """
     merged_strings = []
     shortest, longest = sorted(
@@ -139,3 +139,7 @@ def merge_strings(
                 idx += 1
 
     return merged_strings
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
