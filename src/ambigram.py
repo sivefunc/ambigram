@@ -105,21 +105,14 @@ class Ambigram(object):
                                            delimiter=" ")
 
         if (' ' in first_text or ' ' in second_text):
-            bb_whitespace = cq.Workplane("XZ").text(
-                txt='A',
-                fontsize=self.font_size,
-                distance=self.font_size,
-                halign="left",
-                valign="bottom",
-                fontPath=self.font_path
-            ).val().BoundingBox()
+            bb_whitespace = self.intersect_letters('A','A').val().BoundingBox()
 
         location = (0, 0, 0)
         for (short_char, *long_chars) in self.merged_string:
             bb_int = None
             current_column = [0, 0, 0] 
-            # Intersect each pair of letters
 
+            # Intersect each pair of letters
             if short_char != " " or (long_chars and long_chars[-1] != " "):
                 for long_char in long_chars:
                     x, y, z = location
@@ -278,10 +271,12 @@ class Ambigram(object):
 def main():
     #"AAAAAAAA"
     #"F F F",
+    #"FFFF FFF FFFFF FFF",
+    #"AA AAAAAA AAA",
 
     ambigram = Ambigram(
-        "FFFF FFF FFFFF FFF",
-        "AA AAAAAA AAA",
+        "F  FFFF",
+        "AAAA",
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf",
     )
     

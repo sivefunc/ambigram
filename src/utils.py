@@ -139,5 +139,4 @@ def merge_strings(
         else:
             idx += 1
 
-    pprint.pprint(merged_strings)
     return merged_strings
