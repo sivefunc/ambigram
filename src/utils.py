@@ -109,6 +109,8 @@ def merge_strings(
      ['F', 'W', 'X'],
      ['G', 'Y', 'Z']]
     """
+    
+    # Do not allow leading nor Trailling Delimiter Characters
     if (ignore_delimiter 
         and delimiter in string1[0] + string1[-1] + string2[0] + string2[-1]):
         raise ValueError(
@@ -117,6 +119,8 @@ def merge_strings(
         )
 
     merged_strings = []
+
+    # Sort by len taking in account the delimiter chars if ignore_delimiter.
     shortest, longest = sorted(
         [string1, string2],
         key=lambda x: len(x) - (x.count(delimiter) if ignore_delimiter else 0)
@@ -124,9 +128,11 @@ def merge_strings(
 
     shortest_len, longest_len = len(shortest), len(longest)
 
+    # Do not count because chars will be placed in no delimiter chars
     if ignore_delimiter:
         shortest_len -= shortest.count(delimiter)
 
+    # Longest Chars behind each Short Char.
     column_height = longest_len // shortest_len
     current_longest = 0
 
@@ -137,8 +143,8 @@ def merge_strings(
         # The first character is always the one from the shortest string
         column = [short_char]
 
-        # Add column_height chars to column
-        if short_char != delimiter:
+        # Add column_height chars to column if char is not delimiter.
+        if ignore_delimiter and short_char != delimiter:
             for long_char in longest[current_longest:
                                      current_longest + column_height]:
                 column.append(long_char)
@@ -155,12 +161,20 @@ def merge_strings(
         merged_strings.append(column)
 
     if ignore_delimiter and not allow_delimiter_column:
+
+        # Move words from column untill all columns has atleast one char
+        # different than deimiter.
         idx = 0
         while idx < len(merged_strings) - 1:
             column = merged_strings[idx]
+
+            # Short char with a column of long chars that are only = delimiter.
             if (column[0] != delimiter 
                 and column[1:] 
                 and not any(letter != delimiter for letter in column[1:])):
+
+                # Move the last character of the short word before and 
+                # Place it into the current word.
                 merged_strings[idx].insert(1, merged_strings[idx-1].pop())
                 idx = 0
 
