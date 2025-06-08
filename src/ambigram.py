@@ -39,6 +39,10 @@ class Ambigram(object):
                  ):
         """Creates the 3D Ambigram in a Cadquery Assembly Object
 
+        The placement of letter is diagonally, but if one string is shorter
+        than the other, the long string chars are placed behind the
+        shortest.
+
         2D View of an Ambigram:
         first_text: VERYLONG
         second_text: SHORT
@@ -69,13 +73,18 @@ class Ambigram(object):
                       Non-empty unsorted string without leading nor
                       trailing chars.
 
+        font_size : int, default=16
+                    The height of the letters in the Z direction.
+
         font_path : str, optional
                     Path to the font that the text is going to use
 
+        letter_spacing : int, default=font_size / 16
+                         The space between letters.
         Notes
         -----
         The Ambigram has two perspectives the Positive X Line and the
-        Negative Y Line, each one displays a different string.
+        Positive Y Line, each one displays a different string.
 
         The Algorithms works by intersecting a pair of letters at a time
         and placing them at the assembly instead of placing all letters and
@@ -84,10 +93,15 @@ class Ambigram(object):
         The Insersectiong of a Pair of Letters is by rotating 90 deg a
         letter in the Z direction and then extruding both letters.
 
+        Font Sizes are a weird thing that I don't understand, so I'm going
+        to place this:
+
+        `StackOverflow<https://stackoverflow.com/questions/3495872/how-is-font-size-calculated
+>`_
         See Also
         --------
-        utils.merge_strings : Function that merges two strings
-
+        utils.merge_strings : Function that is used to create the 2D view
+                              of the Ambigram.
         """
 
         self.first_text = first_text
