@@ -44,7 +44,6 @@ class Ambigram(object):
         second_text: SHORT
 
         y(+)
-        ._______x(+)
         | V
         | E
         | S
@@ -58,7 +57,7 @@ class Ambigram(object):
         |    R
         |     G
         |     T
-        y(-)
+        ._______x(+)
 
         Parameters
         ----------
@@ -273,8 +272,16 @@ def main():
         #"F F F",
         #"FFFF FFF FFFFF FFF",
         #"AA AAAAAA AAA",
-        "FFF",
-        "A  A",
+        #"FFFFFFFFFFFFFFF",
+        #"AAAAAAAAAAA",
+        #"F   FF",
+        #"AA",
+        #"FFFF",
+        #"AAAA",
+        #"FFFFFFFF" * 3,
+        #"AAAAAAAA",
+        "FFF" * 2 + "FF",
+        "AAA",
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf",
     )
     
