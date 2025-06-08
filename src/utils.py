@@ -144,7 +144,7 @@ def merge_strings(
         column = [short_char]
 
         # Add column_height chars to column if char is not delimiter.
-        if ignore_delimiter and short_char != delimiter:
+        if not (short_char == delimiter and ignore_delimiter):
             for long_char in longest[current_longest:
                                      current_longest + column_height]:
                 column.append(long_char)
