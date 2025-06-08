@@ -7,9 +7,9 @@ def merge_strings(
     ) -> list[list[str]]:
     """ Place longest string chars behind the shortest string
 
-    Two unsorted strings gets sorted (by length) and the longest gets
-    merged into the shortest one by placing their chars behind in a
-    secuential and equally distributed way.
+    Two non-empty unsorted strings gets sorted (by length) and the
+    longest gets merged into the shortest one by placing their chars
+    behind in a secuential and equally distributed way.
 
     Think of it like adding blocks to each column until all columns
     are equal.
@@ -22,10 +22,13 @@ def merge_strings(
     string2 : str
               Non-empty unsorted string.
     
-    ignore_delimiter : bool, default=True
+    ignore_delimiter : bool, default=False
                        Determines whether or not to place the longest
                        string characters into the delimiters of the
                        shortest word.
+
+                       If True, the leading and trailing delimiter
+                       chars in the strings must be removed.
 
     delimiter : str, default=' '
                 The character that should be ignored and no characters
@@ -106,6 +109,13 @@ def merge_strings(
      ['F', 'W', 'X'],
      ['G', 'Y', 'Z']]
     """
+    if (ignore_delimiter 
+        and delimiter in string1[0] + string1[-1] + string2[0] + string2[-1]):
+        raise ValueError(
+            "Strings with leading and trailing delimiters chars are not valid"
+            "," "do str.strip(chars=delimiter)"
+        )
+
     merged_strings = []
     shortest, longest = sorted(
         [string1, string2],
@@ -144,7 +154,7 @@ def merge_strings(
         # Add merged string to result
         merged_strings.append(column)
 
-    if ignore_delimiters and not allow_delimiter_column:
+    if ignore_delimiter and not allow_delimiter_column:
         idx = 0
         while idx < len(merged_strings) - 1:
             column = merged_strings[idx]

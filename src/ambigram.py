@@ -102,6 +102,7 @@ class Ambigram(object):
         self.merged_string = merge_strings(self.first_text,
                                            self.second_text,
                                            ignore_delimiter=True,
+                                           allow_delimiter_column=False,
                                            delimiter=" ")
 
         if (' ' in first_text or ' ' in second_text):
@@ -124,10 +125,9 @@ class Ambigram(object):
                                                           long_char)
                     bb_int = intersection.val().BoundingBox()
                     intersection = intersection.translate(location)
+                    self.assembly = self.assembly.add(intersection)
 
                 location = x, y + bb_int.ylen + self.letter_spacing, z
-
-                self.assembly = self.assembly.add(intersection)
 
                 current_column[0] = max(current_column[0], bb_int.xlen)
                 current_column[1] += bb_int.ylen + self.letter_spacing
@@ -273,8 +273,8 @@ def main():
         #"F F F",
         #"FFFF FFF FFFFF FFF",
         #"AA AAAAAA AAA",
-        "F F F F F F F",
-        "AAA",
+        "FFF",
+        "A  A",
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf",
     )
     
