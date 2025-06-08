@@ -19,6 +19,12 @@ class Ambigram(object):
     merged_string : None | list[list[str]]
                     The merged string that was used to create the ambigram
 
+    max_column : list[float, float, float]
+                 Dimensions of the possible maximum column, what this
+                 mean is that each component (Xlen, Ylen and Zlen) are
+                 independent so that each one could come from a different
+                 column.
+
     See Also
     --------
     utils.merge_strings : Function that merges two strings
@@ -114,6 +120,8 @@ class Ambigram(object):
             self.letter_spacing = self.font_size / 16
 
         self.assembly = cq.Assembly(loc=cq.Location(0,0,0), name="root")
+
+        # 2D View of the Ambigram
         self.merged_string = merge_strings(self.first_text,
                                            self.second_text,
                                            ignore_delimiter=True,
@@ -126,12 +134,16 @@ class Ambigram(object):
         location = (0, 0, 0)
         for (short_char, *long_chars) in self.merged_string:
             bb_int = None
+
+            # Dimensions of the current column
             current_column = [0, 0, 0] 
 
             # Intersect each pair of letters
             for long_char in long_chars:
                 x, y, z = location
 
+                # A intersection of a whitespace with a letter does not exist
+                # Just move
                 if long_char == " ":
                     bb_int = bb_whitespace
 
@@ -144,6 +156,7 @@ class Ambigram(object):
 
                 location = x, y + bb_int.ylen + self.letter_spacing, z
 
+                # Dimensions of the current column
                 current_column[0] = max(current_column[0], bb_int.xlen)
                 current_column[1] += bb_int.ylen + self.letter_spacing
                 current_column[2] = max(current_column[2], bb_int.zlen)
@@ -157,6 +170,7 @@ class Ambigram(object):
                 y + (bb_int.ylen if short_char == " " and long_chars else 0),
                 z)
 
+            # For each component [X, Y, Z] choose the maximum length.
             self.max_column = list(map(max, zip(self.max_column,
                                                 current_column)))
 
