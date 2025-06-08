@@ -62,10 +62,12 @@ class Ambigram(object):
         Parameters
         ----------
         first_text : str
-                     Non-empty unsorted string.
+                     Non-empty unsorted string without leading nor trailing
+                     chars.
 
         second_text : str
-                      Non-empty unsorted string.
+                      Non-empty unsorted string without leading nor
+                      trailing chars.
 
         font_path : str, optional
                     Path to the font that the text is going to use
