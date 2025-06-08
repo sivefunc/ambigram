@@ -102,12 +102,15 @@ class Ambigram(object):
         Font Sizes are a weird thing that I don't understand, so I'm going
         to place this:
 
-        `StackOverflow<https://stackoverflow.com/questions/3495872/how-is-font-size-calculated
->`_
+        `StackOverflow<https://stackoverflow.com/questions/3495872/how-is-font-size-calculated>`_
+
+        Whitespaces are allowed between letters, but there are still edge
+        cases to cover.
+        
         See Also
         --------
         utils.merge_strings : Function that is used to create the 2D view
-                              of the Ambigram.
+                              of the Ambigram and is used to make it 3D.
         """
 
         self.first_text = first_text
@@ -131,7 +134,10 @@ class Ambigram(object):
         if (' ' in first_text or ' ' in second_text):
             bb_whitespace = self.intersect_letters('A','A').val().BoundingBox()
 
-        location = (0, 0, 0)
+        # X, Y and Z Location of the current Letter that will placed
+        # and will grow +X and +Y
+        location = [0.0, 0.0, 0.0]
+
         for (short_char, *long_chars) in self.merged_string:
             bb_int = None
 
@@ -140,8 +146,6 @@ class Ambigram(object):
 
             # Intersect each pair of letters
             for long_char in long_chars:
-                x, y, z = location
-
                 # A intersection of a whitespace with a letter does not exist
                 # Just move
                 if long_char == " ":
@@ -154,7 +158,7 @@ class Ambigram(object):
                     intersection = intersection.translate(location)
                     self.assembly = self.assembly.add(intersection)
 
-                location = x, y + bb_int.ylen + self.letter_spacing, z
+                location[1] += bb_int.ylen + self.letter_spacing
 
                 # Dimensions of the current column
                 current_column[0] = max(current_column[0], bb_int.xlen)
@@ -164,11 +168,10 @@ class Ambigram(object):
             if short_char == " ":
                 bb_int = bb_whitespace
 
-            x, y, z = location
-            location = (
-                x + bb_int.xlen + self.letter_spacing,
-                y + (bb_int.ylen if short_char == " " and long_chars else 0),
-                z)
+            location[0] += bb_int.xlen + self.letter_spacing
+            
+            if short_char == " " and long_chars:
+                location[1] += bb_int.ylen
 
             # For each component [X, Y, Z] choose the maximum length.
             self.max_column = list(map(max, zip(self.max_column,
@@ -300,8 +303,8 @@ def main():
     ambigram = Ambigram(
         #"AAAAAAAA",
         #"F F F",
-        #"FFFF FFF FFFFF FFF",
-        #"AA AAAAAA AAA",
+        "FFFF FFF FFFFF FFF",
+        "AA AAAAAA AAA",
         #"FFFFFFFFFFFFFFF",
         #"AAAAAAAAAAA",
         #"F   FF",
@@ -310,8 +313,8 @@ def main():
         #"AAAA",
         #"FFFFFFFF" * 3,
         #"AAAAAAAA",
-        "FFF" * 2 + "FF",
-        "AAA",
+        #"FFF" * 2 + "FF",
+        #"AAA",
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf",
     )
     
