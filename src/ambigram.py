@@ -179,7 +179,33 @@ class Ambigram(object):
             self.max_column = list(map(max, zip(self.max_column,
                                                 current_column)))
 
-    def intersect_letters(self, short_char, long_char):
+    def intersect_letters(
+        self,
+        short_char: str,
+        long_char: str,
+    ) -> cq.Workplane:
+        """ Intersect the short char and the long char
+
+        Parameters
+        ----------
+        short_char : str
+                    Letter visible at the Positive X Line
+
+        long_char : str
+                    Letter visible at the Positive Y Line
+        
+        Returns
+        -------
+        intersection : cq.Workplane
+
+        Notes
+        -----
+        The long char will be rotated 90 degrees.
+
+        The reason this works to create two perspectives is due
+        to the intersection seletings the 3D points that only belongs
+        to both, so if you in a Letter you won't see the other letter.
+        """
         # Letter that will be visible in the Positive X Line
         xline = cq.Workplane("XZ").text(
             txt=short_char,
