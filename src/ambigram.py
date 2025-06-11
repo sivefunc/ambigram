@@ -1,3 +1,5 @@
+from typing import Self
+
 import cadquery as cq
 from cadquery.vis import show
 
@@ -188,7 +190,7 @@ class Ambigram(object):
             fontPath=self.font_path
         )
 
-        # Letter that will be visible in the Negative Y Line
+        # Letter that will be visible in the Positive Y Line
         yline = cq.Workplane("XZ").text(
             txt=long_char,
             fontsize=self.font_size,
@@ -239,13 +241,62 @@ class Ambigram(object):
         return self
 
 
-    def add_letter_support(self,
-                           letter_id: str,
-                           cylinder_height: int = None,
-                           cylinder_radius: int = None,
-                           square_height: int = None):
+    def add_letter_support(
+        self,
+        letter_name: str,
+        cylinder_height: int = None,
+        cylinder_radius: int = None,
+        rect_height: int = None
+    ) -> Self:
+        """ Add a Letter Support to a letter in an assembly
 
-        letter = self.assembly.objects[letter_id].toCompound().BoundingBox()
+        The letter sits ontop of a support that consists of a cylinder
+        and a rectangle where the rectangle sits ontop of the cylinder.
+
+        Parameters
+        ----------
+        letter_name : str
+                      Unique Identifier of the Letter Object added to the
+                      self.assembly.
+
+        cylinder_height : int, optional
+                          Cylinder extrude height at the Z direction.
+
+        cylinder_radius : int, optional
+                          Cylinder radius at the X and Y direction.
+
+        rect_height     : int, optional
+                          Rectangle extrude height at the Z direction.
+
+        Returns
+        -------
+        self : Ambigram
+               The object returns itself for method chaining.
+
+        Notes
+        -----
+        It's not necessary to have both the cylinder and rectangle, you
+        could have a cylinder without the rectangle sitting ontop of it.
+        """
+        if cylinder_height == cylinder_radius == rect_height == None:
+            raise ValueError("Neither the Cylinder nor rect. were provided.")
+
+        if rect_height == None and None in [cylinder_height, cylinder_radius]:
+            raise ValueError("Cylinder needs both a height and a radius.")
+
+        # Dimensions and Position of the Letter
+        letter = self.assembly.objects[letter_name].toCompound().BoundingBox()
+        
+        rectangle_support = (
+            cq.Workplane("XY")
+            .box(letter.xlen, letter.ylen, rect_height, centered=False)
+            .translate([
+                letter.xmin,
+                letter.ymin,
+                letter.zmin - rect_height
+            ])
+            if rect_height is not None else None
+        )
         cylinder_support = (
             cq.Workplane("XY")
             .cylinder(cylinder_height, cylinder_radius, centered=[
@@ -255,29 +306,22 @@ class Ambigram(object):
                 letter.center.x,
                 letter.center.y,
                 letter.zmin - cylinder_height - (
-                    0 if square_height is None else square_height 
+                    # Place it under the rectangle if exists
+                    0 if rect_height is None else rect_height 
                 )
             ])
             if None not in [cylinder_radius, cylinder_height] else None
         )
 
-        rectangle_support = (
-            cq.Workplane("XY")
-            .box(letter.xlen, letter.ylen, square_height, centered=False)
-            .translate([
-                letter.xmin,
-                letter.ymin,
-                letter.zmin - square_height
-            ])
-            if square_height is not None else None
-        )
-
+        # Both supports were created
         if None not in [cylinder_support, rectangle_support]:
             support_base = rectangle_support.union(cylinder_support)
 
+        # Only cylinder support was created
         elif cylinder_support is not None:
             support_base = cylinder_support
 
+        # Only rectangle support was created
         else:
             support_base = rectangle_support
 
@@ -287,24 +331,26 @@ class Ambigram(object):
     def add_letter_support_to_all(self,
                                   cylinder_height: int = None,
                                   cylinder_radius: int = None,
-                                  square_height: int = None
+                                  rect_height: int = None
                                   ):
-        for letter_id in list(self.assembly.objects.keys()):
-            if letter_id in ['root', 'base', 'blank_space']:
+        for letter_name in list(self.assembly.objects.keys()):
+            if letter_name in ['root', 'base']:
                 continue
 
-            self.add_letter_support(letter_id,
+            self.add_letter_support(letter_name,
                                     cylinder_height,
                                     cylinder_radius,
-                                    square_height)
+                                    rect_height)
         return self
 
 def main():
     ambigram = Ambigram(
+        "AAA",
+        "FFF",
         #"AAAAAAAA",
         #"F F F",
-        "FFFF FFF FFFFF FFF",
-        "AA AAAAAA AAA",
+        #"FFFF FFF FFFFF FFF",
+        #"AA AAAAAA AAA",
         #"FFFFFFFFFFFFFFF",
         #"AAAAAAAAAAA",
         #"F   FF",
@@ -321,7 +367,7 @@ def main():
     ambigram = ambigram.add_letter_support_to_all(
         cylinder_height=ambigram.font_size / 4,
         cylinder_radius=ambigram.font_size / 4,
-        square_height=ambigram.font_size / 16,
+        rect_height=ambigram.font_size / 16,
     )
 
     ambigram = ambigram.add_base(height=ambigram.font_size / 10).assembly
