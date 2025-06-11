@@ -328,19 +328,54 @@ class Ambigram(object):
         self.assembly = self.assembly.add(support_base)
         return self
     
-    def add_letter_support_to_all(self,
-                                  cylinder_height: int = None,
-                                  cylinder_radius: int = None,
-                                  rect_height: int = None
-                                  ):
+    def add_letter_support_to_all(
+        self,
+        cylinder_height: int = None,
+        cylinder_radius: int = None,
+        rect_height: int = None
+    ) -> Self:
+        """ Add a Letter Support to each letter in the whole Assembly
+
+        Parameters
+        ----------
+        cylinder_height : int, optional
+                          Cylinder extrude height at the Z direction.
+
+        cylinder_radius : int, optional
+                          Cylinder radius at the X and Y direction.
+
+        rect_height     : int, optional
+                          Rectangle extrude height at the Z direction.
+
+        Returns
+        -------
+        self : Ambigram
+               The object returns itself for method chaining.
+
+        Notes
+        -----
+        Whitespaces, Root and Base are ignored.
+
+        It's not necessary to have both the cylinder and rectangle, you
+        could have a cylinder without the rectangle sitting ontop of it.
+
+        See Also
+        --------
+        Ambigram.add_letter_support : Ambigram Method to add a support to
+                                      a single object.
+        """
         for letter_name in list(self.assembly.objects.keys()):
+            # Whitespaces are also ignored because they are not objects
+            # added in self.assembly.
             if letter_name in ['root', 'base']:
                 continue
 
-            self.add_letter_support(letter_name,
-                                    cylinder_height,
-                                    cylinder_radius,
-                                    rect_height)
+            self.add_letter_support(
+                letter_name,
+                cylinder_height,
+                cylinder_radius,
+                rect_height
+            )
         return self
 
 def main():
