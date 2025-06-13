@@ -41,8 +41,8 @@ class Ambigram(object):
     def __init__(self,
                  first_text: str,
                  second_text: str,
-                 font_size: int = 16,
-                 letter_spacing: int = None,
+                 font_size: float = 16,
+                 letter_spacing: float = None,
                  font_path: str = None,
                  ):
         """Creates the 3D Ambigram in a Cadquery Assembly Object
@@ -81,13 +81,13 @@ class Ambigram(object):
                       Non-empty unsorted string without leading nor
                       trailing chars.
 
-        font_size : int, default=16
+        font_size : float, default=16
                     The height of the letters in the Z direction.
 
         font_path : str, optional
                     Path to the font that the text is going to use
 
-        letter_spacing : int, default=font_size / 16
+        letter_spacing : float, default=font_size / 16
                          The space between letters.
         Notes
         -----
@@ -248,7 +248,7 @@ class Ambigram(object):
         intersection = xline.intersect(yline)
         return intersection
 
-    def add_base(self, height: int):
+    def add_base(self, height: float):
         bb = self.assembly.toCompound().BoundingBox()
         self.base = (cq.Workplane("XY").polyline([
             [bb.xmin + self.max_column[0], bb.ymin],
@@ -270,9 +270,9 @@ class Ambigram(object):
     def add_letter_support(
         self,
         letter_name: str,
-        cylinder_height: int = None,
-        cylinder_radius: int = None,
-        rect_height: int = None
+        cylinder_height: float = None,
+        cylinder_radius: float = None,
+        rect_height: float = None
     ) -> Self:
         """ Add a Letter Support to a letter in an assembly
 
@@ -285,13 +285,13 @@ class Ambigram(object):
                       Unique Identifier of the Letter Object added to the
                       self.assembly.
 
-        cylinder_height : int, optional
+        cylinder_height : float, optional
                           Cylinder extrude height at the Z direction.
 
-        cylinder_radius : int, optional
+        cylinder_radius : float, optional
                           Cylinder radius at the X and Y direction.
 
-        rect_height     : int, optional
+        rect_height     : float, optional
                           Rectangle extrude height at the Z direction.
 
         Returns
@@ -356,21 +356,21 @@ class Ambigram(object):
     
     def add_letter_support_to_all(
         self,
-        cylinder_height: int = None,
-        cylinder_radius: int = None,
-        rect_height: int = None
+        cylinder_height: float = None,
+        cylinder_radius: float = None,
+        rect_height: float = None
     ) -> Self:
         """ Add a Letter Support to each letter in the whole Assembly
 
         Parameters
         ----------
-        cylinder_height : int, optional
+        cylinder_height : float, optional
                           Cylinder extrude height at the Z direction.
 
-        cylinder_radius : int, optional
+        cylinder_radius : float, optional
                           Cylinder radius at the X and Y direction.
 
-        rect_height     : int, optional
+        rect_height     : float, optional
                           Rectangle extrude height at the Z direction.
 
         Returns
@@ -426,12 +426,12 @@ def main():
     )
     
     ambigram = ambigram.add_letter_support_to_all(
-        cylinder_height=ambigram.font_size / 4,
-        cylinder_radius=ambigram.font_size / 4,
-        rect_height=ambigram.font_size / 16,
+        cylinder_height=ambigram.font_size / 4.0,
+        cylinder_radius=ambigram.font_size / 4.0,
+        rect_height=ambigram.font_size / 16.0,
     )
 
-    ambigram = ambigram.add_base(height=ambigram.font_size / 10).assembly
+    ambigram = ambigram.add_base(height=ambigram.font_size / 10.0).assembly
 
     show(ambigram)
 if __name__ == "__main__":
