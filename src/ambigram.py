@@ -56,19 +56,19 @@ class Ambigram(object):
         second_text: SHORT
 
         y(+)
-        | V
-        | E
-        | S
-        |  R
-        |  Y
-        |  H
-        |   L
-        |   O
-        |   O
-        |    N
-        |    R
         |     G
         |     T
+        |    N
+        |    R
+        |   O
+        |   L
+        |   O 
+        |  Y
+        |  R  
+        |  H   
+        | E   
+        | V    
+        | S    
         ._______x(+)
 
         Parameters
