@@ -248,6 +248,53 @@ class Ambigram(object):
         intersection = xline.intersect(yline)
         return intersection
 
+    def add_base_rectangle(self, height: float, padding: float = 0.0) -> Self:
+        """ Rectangle base that goes from Xmin, Ymin to Xmax, Ymax
+
+        Parameters
+        ----------
+        height : float
+                 Rectangle extrude height at the Z Direction.
+
+        padding : float, optional
+                  Space added to the border at the X and Y direction.
+
+        Returns
+        -------
+        self : Ambigram
+               The object returns itself for method chaining.
+
+        Notes
+        -----
+                  Padding(+)       Padding(+)
+        Padding(-)+-------------------------+ Padding(+)
+                  |              Ymax       |
+                  |      #-----------+ Xmax |
+                  |      |           |      |
+                  |      |           |      |
+                  |      |           |      |
+                  |      |           |      |
+                  |      |           |      |
+                  | Ymin +-----------#      |
+                  |     Xmin                |
+        Padding(-)+-------------------------+ Padding(+)
+                  Padding(-)       Padding(-)
+        """
+
+        bb = self.assembly.toCompound().BoundingBox()
+        self.base = (cq.Workplane("XY").polyline([
+            [bb.xmin - padding, bb.ymin - padding], # Bottom Left Corner
+            [bb.xmin - padding, bb.ymax + padding], # Top Left Corner
+            [bb.xmax + padding, bb.ymax + padding], # Top Right Corner
+            [bb.xmax + padding, bb.ymin - padding], # Bottom Right Corner
+            ])
+            .close()
+            .extrude(height)
+            .translate([bb.xmin, bb.ymin, bb.zmin - height])
+        )
+        self.assembly = self.assembly.add(self.base, name="base")
+        return self
+
     def add_base(self, height: float):
         bb = self.assembly.toCompound().BoundingBox()
         self.base = (cq.Workplane("XY").polyline([
@@ -406,14 +453,14 @@ class Ambigram(object):
 
 def main():
     ambigram = Ambigram(
-        "AAA",
-        "FFF",
+        #"AAA",
+        #"FFF",
         #"AAAAAAAA",
         #"F F F",
         #"FFFF FFF FFFFF FFF",
         #"AA AAAAAA AAA",
-        #"FFFFFFFFFFFFFFF",
-        #"AAAAAAAAAAA",
+        "FFFFFFFFFFFFFFF",
+        "AAAAAAAAAAA",
         #"F   FF",
         #"AA",
         #"FFFF",
@@ -431,8 +478,10 @@ def main():
         rect_height=ambigram.font_size / 16.0,
     )
 
-    ambigram = ambigram.add_base(height=ambigram.font_size / 10.0).assembly
-
-    show(ambigram)
+    ambigram = ambigram.add_base_rectangle(
+        height=ambigram.font_size / 10.0,
+        padding=ambigram.font_size
+    )
+    show(ambigram.assembly)
 if __name__ == "__main__":
     main()
