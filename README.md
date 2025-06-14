@@ -21,6 +21,7 @@
         style="width: 100%; max-width: 400px"
         alt="Ambigram Word in the Y Perspective"><br>
 </div>
+
 # :bookmark: Table of contents
 1. [About](#about)
 2. [Installation](#installation)
