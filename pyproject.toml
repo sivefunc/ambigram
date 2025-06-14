@@ -10,8 +10,8 @@ authors = [
   { name="sivefunc", email="sivefunc@tuta.io" },
 ]
 
-description = "Ambigram"
-# readme = {file = 'README.md', content-type='text/markdown', charset="UTF-8", variant="GFM"}
+description = "3D Ambigram Generation using Cadquery"
+readme = {file = 'README.md', content-type='text/markdown', charset="UTF-8", variant="GFM"}
 requires-python = ">=3.11"
 
 license = { file = "LICENSE" }
@@ -29,13 +29,13 @@ dev = [
     "pylint"
 ]
 
-keywords = ['linux', 'python3']
+keywords = ['linux', 'python3', 'ambigram', 'cadquery']
 
 [tool.setuptools.dynamic]
 version = {attr = "_version.__version__"}
 
 [project.urls]
-Homepage = "https://github.com/Sivefunc/"
+Homepage = "https://github.com/Sivefunc/ambigram"
 
 [project.scripts]
 Ambigram = "ambigram:main"
