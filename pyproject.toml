@@ -24,6 +24,10 @@ license = { file = "LICENSE" }
 dependencies = [
     "cadquery"
 ]
+[project.optional-dependencies]
+dev = [
+    "pylint"
+]
 
 keywords = ['linux', 'python3']
 

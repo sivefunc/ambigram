@@ -55,6 +55,9 @@ class Ambigram(object):
         first_text: VERYLONG
         second_text: SHORT
 
+        merged_string = VRL
+                        EYONG
+                        SHORT
         y(+)
         |     G
         |     T
@@ -147,6 +150,8 @@ class Ambigram(object):
             current_column = [0, 0, 0] 
 
             # Intersect each pair of letters
+            # It's possible to not have long_chars, that is when
+            # the short character has a whitespace.
             for long_char in long_chars:
                 # A intersection of a whitespace with a letter does not exist
                 # Just move
@@ -548,8 +553,6 @@ def main():
         #"F F F",
         #"FFFF FFF FFFFF FFF",
         #"AA AAAAAA AAA",
-        "AAA",
-        "FFF",
         #"FFFFFFFFFFFFFFF",
         #"AAAAAAAAAAA",
         #"AAAAA",
@@ -562,6 +565,8 @@ def main():
         #"AAAAAAAA",
         #"FFF" * 2 + "FF",
         #"AAA",
+        "AMBIGRAM",
+        "CADQUERY",
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf",
     )
     
