@@ -1,3 +1,4 @@
+""" 3D Ambigram Generation using CadQuery """
 from typing import Self
 
 import cadquery as cq
@@ -6,7 +7,7 @@ from cadquery.vis import show
 from utils import merge_strings
 from _version import __version__
 
-class Ambigram(object):
+class Ambigram:
     """3D Ambigram Generation using CadQuery
 
     A 3D Ambigram is a optical illusion where two texts gets merged
@@ -378,7 +379,7 @@ class Ambigram(object):
         base_points.append([bb.xmin - padding, bb.ymin - padding])
 
         # Go from bottom to top and then left to right
-        for idx, letter_name in enumerate(letters):
+        for letter_name in letters:
             letter = self.assembly.objects[letter_name]
             letter = letter.toCompound().BoundingBox()
             base_points.append([letter.xmin - padding, letter.ymax + padding])
@@ -387,7 +388,7 @@ class Ambigram(object):
         base_points.append([bb.xmax + padding, bb.ymax + padding])
 
         # Go from top to bottom and then right to left
-        for idx, letter_name in enumerate(reversed(letters)):
+        for letter_name in reversed(letters):
             letter = self.assembly.objects[letter_name]
             letter = letter.toCompound().BoundingBox()
             base_points.append([letter.xmax + padding, letter.ymin - padding])
@@ -441,7 +442,7 @@ class Ambigram(object):
         if cylinder_height == cylinder_radius == rect_height == None:
             raise ValueError("Neither the Cylinder nor rect. were provided.")
 
-        if rect_height == None and None in [cylinder_height, cylinder_radius]:
+        if rect_height is None and None in [cylinder_height, cylinder_radius]:
             raise ValueError("Cylinder needs both a height and a radius.")
 
         # Dimensions and Position of the Letter
@@ -541,6 +542,7 @@ class Ambigram(object):
         return self
 
 def main():
+    """ Example Program """
     ambigram = Ambigram(
         #"AAA",
         #"FFF",
@@ -575,5 +577,6 @@ def main():
         padding=ambigram.font_size / 10.0,
     )
     show(ambigram.assembly)
+
 if __name__ == "__main__":
     main()
