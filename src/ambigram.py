@@ -139,7 +139,7 @@ class Ambigram(object):
         # X, Y and Z Location of the current Letter that will placed
         # and will grow +X and +Y
         location = [0.0, 0.0, 0.0]
-
+        idx = 0
         for (short_char, *long_chars) in self.merged_string:
             bb_int = None
 
@@ -158,7 +158,10 @@ class Ambigram(object):
                                                           long_char)
                     bb_int = intersection.val().BoundingBox()
                     intersection = intersection.translate(location)
-                    self.assembly = self.assembly.add(intersection)
+                    self.assembly = self.assembly.add(
+                        intersection,
+                        name=str(idx)
+                    )
 
                 location[1] += bb_int.ylen + self.letter_spacing
 
@@ -166,6 +169,8 @@ class Ambigram(object):
                 current_column[0] = max(current_column[0], bb_int.xlen)
                 current_column[1] += bb_int.ylen + self.letter_spacing
                 current_column[2] = max(current_column[2], bb_int.zlen)
+
+                idx += 1
 
             if short_char == " ":
                 bb_int = bb_whitespace
@@ -249,7 +254,7 @@ class Ambigram(object):
         return intersection
 
     def add_base_rectangle(self, height: float, padding: float = 0.0) -> Self:
-        """ Rectangle base that goes from Xmin, Ymin to Xmax, Ymax
+        """Rectangle base that goes from Xmin, Ymin to Xmax, Ymax
 
         Parameters
         ----------
@@ -295,24 +300,104 @@ class Ambigram(object):
         self.assembly = self.assembly.add(self.base, name="base")
         return self
 
-    def add_base(self, height: float):
-        bb = self.assembly.toCompound().BoundingBox()
-        self.base = (cq.Workplane("XY").polyline([
-            [bb.xmin + self.max_column[0], bb.ymin],
-            [bb.xmin, bb.ymin],
-            [bb.xmin, bb.ymin + self.max_column[1]],
+    def add_base_p2p(self, height: float, padding: float = 0.0):
+        """ Base that goes from Xmin, Ymin to Xmax, Ymax
 
-            [bb.xmax - self.max_column[0], bb.ymax],
-            [bb.xmax, bb.ymax],
-            [bb.xmax, bb.ymax - self.max_column[1]]
-            ])
-            .close()
-            .extrude(height)
-            .translate([bb.xmin, bb.ymin, bb.zmin - height])
-        )
+        Parameters
+        ----------
+        height : float
+                 Rectangle extrude height at the Z Direction.
+
+        padding : float, optional
+                  Space added to the border at the X and Y direction.
+
+        Returns
+        -------
+        self : Ambigram
+               The object returns itself for method chaining.
+
+        Notes
+        -----
+        The base is a closed polygon made of points which is done in the
+        following five steps:
+
+        1. Start at the bottom left corner (Xmin, Ymax)
+
+        2. for each letter (bottom to top and left to right)
+            Connect the coordinate (Xmin, Ymax) from the current letter to
+            the last point.
+
+            (Xmin, Ymax) is the Top left corner.
+
+        3. You are currently at the last letter (Xmin, Ymax) move now to
+            (Xmax, Ymax) this is also the top right corner of the assembly.
+
+        4. for each letter (top to bottom, right to left)
+            Connect the coordinate (Xmax, Ymin) from the current letter to
+            the last point.
+
+            (Xmax, Ymin) is the Bottom right corner.
+
+        5. You are currently at the last letter (Xmax, Ymin) move now to
+            (Xmax, Ymax) this is also the bottom left corner of the
+            assembly.
+           
+                +--+
+              / |  |
+             /  |  |
+            /   +--+
+            +--+   /
+          / |  |  /
+         /  |  | /
+        /   +--+
+        +--+   /
+        |  |  /
+        |  | /
+        +--+
+
+        See Also
+        --------
+        Ambigram.add_base_rectangle: To visually understand how padding
+                                      is added
+        """
+        base_points = []
+        bb = self.assembly.toCompound().BoundingBox()
+
+        # Remove anything but letters.
+        letters = sorted(filter(
+            lambda letter_name:
+                letter_name not in ['root', 'base'] 
+                    and 'support' not in letter_name,
+            self.assembly.objects.keys()
+        ), key=lambda letter_name: int(letter_name))
+
+        # Start at the bottom left corner
+        base_points.append([bb.xmin - padding, bb.ymin - padding])
+
+        # Go from bottom to top and then left to right
+        for idx, letter_name in enumerate(letters):
+            letter = self.assembly.objects[letter_name]
+            letter = letter.toCompound().BoundingBox()
+            base_points.append([letter.xmin - padding, letter.ymax + padding])
+
+        # Start at the top right corner
+        base_points.append([bb.xmax + padding, bb.ymax + padding])
+
+        # Go from top to bottom and then right to left
+        for idx, letter_name in enumerate(reversed(letters)):
+            letter = self.assembly.objects[letter_name]
+            letter = letter.toCompound().BoundingBox()
+            base_points.append([letter.xmax + padding, letter.ymin - padding])
+
+        self.base = (cq.Workplane("XY")
+                     .polyline(base_points)
+                     .close()
+                     .extrude(height)
+                     .translate([bb.xmin, bb.ymin, bb.zmin - height])
+                     )
+        
         self.assembly = self.assembly.add(self.base, name="base")
         return self
-
 
     def add_letter_support(
         self,
@@ -321,7 +406,7 @@ class Ambigram(object):
         cylinder_radius: float = None,
         rect_height: float = None
     ) -> Self:
-        """ Add a Letter Support to a letter in an assembly
+        """Add a Letter Support to a letter in an assembly
 
         The letter sits ontop of a support that consists of a cylinder
         and a rectangle where the rectangle sits ontop of the cylinder.
@@ -398,7 +483,11 @@ class Ambigram(object):
         else:
             support_base = rectangle_support
 
-        self.assembly = self.assembly.add(support_base)
+        self.assembly = self.assembly.add(
+            support_base,
+            name=f"support-{letter_name}"
+        )
+
         return self
     
     def add_letter_support_to_all(
@@ -459,8 +548,12 @@ def main():
         #"F F F",
         #"FFFF FFF FFFFF FFF",
         #"AA AAAAAA AAA",
-        "FFFFFFFFFFFFFFF",
-        "AAAAAAAAAAA",
+        "AAA",
+        "FFF",
+        #"FFFFFFFFFFFFFFF",
+        #"AAAAAAAAAAA",
+        #"AAAAA",
+        #"FFF",
         #"F   FF",
         #"AA",
         #"FFFF",
@@ -478,9 +571,9 @@ def main():
         rect_height=ambigram.font_size / 16.0,
     )
 
-    ambigram = ambigram.add_base_rectangle(
+    ambigram = ambigram.add_base_p2p(
         height=ambigram.font_size / 10.0,
-        padding=ambigram.font_size
+        padding=ambigram.font_size / 10.0,
     )
     show(ambigram.assembly)
 if __name__ == "__main__":
