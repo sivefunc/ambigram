@@ -1,3 +1,4 @@
+"""Utility functions used for Ambigram creation."""
 def merge_strings(
     string1: str,
     string2: str,
@@ -109,10 +110,12 @@ def merge_strings(
      ['F', 'W', 'X'],
      ['G', 'Y', 'Z']]
     """
-    
     # Do not allow leading nor Trailling Delimiter Characters
-    if (ignore_delimiter 
-        and delimiter in string1[0] + string1[-1] + string2[0] + string2[-1]):
+    if (ignore_delimiter
+            and delimiter in (string1[0]
+                              + string1[-1]
+                              + string2[0]
+                              + string2[-1])):
         raise ValueError(
             "Strings with leading and trailing delimiters chars are not valid"
             "," "do str.strip(chars=delimiter)"
@@ -139,7 +142,6 @@ def merge_strings(
     # Start Distributing Equally
     column_extra_added = 0
     for short_char in shortest:
-        
         # The first character is always the one from the shortest string
         column = [short_char]
 
@@ -169,11 +171,11 @@ def merge_strings(
             column = merged_strings[idx]
 
             # Short char with a column of long chars that are only = delimiter.
-            if (column[0] != delimiter 
-                and column[1:] 
+            if (column[0] != delimiter
+                and column[1:]
                 and not any(letter != delimiter for letter in column[1:])):
 
-                # Move the last character of the short word before and 
+                # Move the last character of the short word before and
                 # Place it into the current word.
                 merged_strings[idx].insert(1, merged_strings[idx-1].pop())
                 idx = 0
