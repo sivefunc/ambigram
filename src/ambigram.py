@@ -37,7 +37,6 @@ class Ambigram(object):
     base = None
 
     max_column = [0, 0, 0]
-    
     def __init__(self,
                  first_text: str,
                  second_text: str,
@@ -147,7 +146,7 @@ class Ambigram(object):
             bb_int = None
 
             # Dimensions of the current column
-            current_column = [0, 0, 0] 
+            current_column = [0, 0, 0]
 
             # Intersect each pair of letters
             # It's possible to not have long_chars, that is when
@@ -181,7 +180,6 @@ class Ambigram(object):
                 bb_int = bb_whitespace
 
             location[0] += bb_int.xlen + self.letter_spacing
-            
             if short_char == " " and long_chars:
                 location[1] += bb_int.ylen
 
@@ -254,7 +252,7 @@ class Ambigram(object):
         # translate(0,0,0) won't work (amazing I know)
         xline = xline.translate([-bbx.xmin,-bbx.ymin,-bbx.zmin])
         yline = yline.translate([-bby.xmin,-bby.ymin,-bby.zmin])
-        
+
         intersection = xline.intersect(yline)
         return intersection
 
@@ -371,7 +369,7 @@ class Ambigram(object):
         # Remove anything but letters.
         letters = sorted(filter(
             lambda letter_name:
-                letter_name not in ['root', 'base'] 
+                letter_name not in ['root', 'base']
                     and 'support' not in letter_name,
             self.assembly.objects.keys()
         ), key=lambda letter_name: int(letter_name))
@@ -400,7 +398,6 @@ class Ambigram(object):
                      .extrude(height)
                      .translate([bb.xmin, bb.ymin, bb.zmin - height])
                      )
-        
         self.assembly = self.assembly.add(self.base, name="base")
         return self
 
@@ -449,9 +446,7 @@ class Ambigram(object):
 
         # Dimensions and Position of the Letter
         letter = self.assembly.objects[letter_name].toCompound().BoundingBox()
-        
-        rectangle_support = (
-            cq.Workplane("XY")
+        rectangle_support = (cq.Workplane("XY")
             .box(letter.xlen, letter.ylen, rect_height, centered=False)
             .translate([
                 letter.xmin,
@@ -470,7 +465,7 @@ class Ambigram(object):
                 letter.center.y,
                 letter.zmin - cylinder_height - (
                     # Place it under the rectangle if exists
-                    0 if rect_height is None else rect_height 
+                    0 if rect_height is None else rect_height
                 )
             ])
             if None not in [cylinder_radius, cylinder_height] else None
@@ -494,7 +489,7 @@ class Ambigram(object):
         )
 
         return self
-    
+
     def add_letter_support_to_all(
         self,
         cylinder_height: float = None,
@@ -569,7 +564,6 @@ def main():
         "CADQUERY",
         font_path="/usr/share/fonts/truetype/ibm-plex/IBMPlexSans-Bold.ttf",
     )
-    
     ambigram = ambigram.add_letter_support_to_all(
         cylinder_height=ambigram.font_size / 4.0,
         cylinder_radius=ambigram.font_size / 4.0,
