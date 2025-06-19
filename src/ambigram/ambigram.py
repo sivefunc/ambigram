@@ -3,8 +3,8 @@ from typing import Self
 
 import cadquery as cq
 
-from utils import merge_strings
-from _version import __version__
+from .utils import merge_strings
+from ._version import __version__
 
 class Ambigram:
     """3D Ambigram Generation using CadQuery
