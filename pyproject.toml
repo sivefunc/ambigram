@@ -32,10 +32,10 @@ dev = [
 keywords = ['linux', 'python3', 'ambigram', 'cadquery']
 
 [tool.setuptools.dynamic]
-version = {attr = "_version.__version__"}
+version = {attr = "ambigram._version.__version__"}
 
 [project.urls]
 Homepage = "https://github.com/Sivefunc/ambigram"
 
 [project.scripts]
-Ambigram = "ambigram:main"
+Ambigram = "ambigram.ambigram:main"

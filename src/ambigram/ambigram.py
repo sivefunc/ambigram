@@ -2,7 +2,6 @@
 from typing import Self
 
 import cadquery as cq
-from cadquery.vis import show
 
 from utils import merge_strings
 from _version import __version__
@@ -543,6 +542,7 @@ class Ambigram:
 
 def main():
     """ Example Program """
+    from cadquery.vis import show
     ambigram = Ambigram(
         #"AAA",
         #"FFF",
